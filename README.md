@@ -1,36 +1,58 @@
 # Rails APP w JS Frontend Project Setup
----
-You will be building a rails backend and JS frontend project this week. This document will walk you through setting up your project. The instructions and requirements for this assignment can be found [here](https://github.com/learn-co-curriculum/js-final-project-guidelines)
 
-We are going to need two separate repositories. This guide has everything in one repo for simplicity but your JS should be in one repo and your API in another.
+---
+
+In this lesson, you will be building a Rails API backend and JS frontend
+project. This lesson will point you in the right direction for your upcoming
+Rails App w Javascript Frontend Portfolio Project. This document will walk you
+through setting up your project. The instructions and requirements for this
+assignment can be found
+[here](https://learn.co/tracks/full-stack-web-development-v3/rails-and-javascript/project-mode/rails-app-with-a-jquery-front-end)
+
+We are going to need two separate repositories. This guide has everything in one
+repo for simplicity but your JS should be in one repo and your API in another.
 
 # Setting Up the Rails API
----
-+ We are going to generate a new rails **API** project.
-
-  + In your terminal enter the following command:
-
-  + `rails new MY-NEW-PROJECT-NAME --database=postgresql --api`
-
-  + **Replace MY-NEW-PROJECT-NAME with the *actual* name of your project**
-
-  + This will generate a new rails project using postgres as the database. **Make sure you are running postgres on your computer**. Look for the elephant icon at the top of your screen.
-
-  + We specify the `--api` flag so rails knows to set this up as an API.
-  
-  + `cd` into the new project folder you just created
-
-+ Navigate to your gemfile and uncomment `gem 'rack-cors'` This will allow us to setup Cross Origin Resource Sharing (CORS) in our API. You can read more about CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
-
-  + Basically, CORS is a security feature that prevents API calls from unknown origins. For example, if someone tried to use some malicious JavaScript to steal your bank information and your bank allowed API calls from anywhere, this could be a bad news bears situation.
-
-+ Make sure you add the `gem 'active_model_serializers'` to your gemfile. Read [this](https://en.wikipedia.org/wiki/Serialization) if you're curious about serialization. Essentially, we need to convert our data into a format that can be easily transferred across a network and reconstructed later. Remember, our frontend and backend live in different repositories and therefore have to make requests across the *interwebs*.
-
-+ Run `bundle install` or just `bundle` if you feel fancy and like shortcuts
 
 ---
 
-+ Inside of `config/initializers/cors.rb` uncomment the following code:
+* We are going to generate a new rails **API** project.
+
+  * In your terminal enter the following command:
+
+  * `rails new MY-NEW-PROJECT-NAME --database=postgresql --api`
+
+  * **Replace MY-NEW-PROJECT-NAME with the _actual_ name of your project**
+
+  * This will generate a new rails project using postgres as the database.
+    **Make sure you are running postgres on your computer**. Look for the
+    elephant icon at the top of your screen.
+
+  * We specify the `--api` flag so rails knows to set this up as an API.
+
+  * `cd` into the new project folder you just created
+
+* Navigate to your gemfile and uncomment `gem 'rack-cors'` This will allow us to
+  setup Cross Origin Resource Sharing (CORS) in our API. You can read more about
+  CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
+
+  * Basically, CORS is a security feature that prevents API calls from unknown
+    origins. For example, if someone tried to use some malicious JavaScript to
+    steal your bank information and your bank allowed API calls from anywhere,
+    this could be a bad news bears situation.
+
+* Make sure you add the `gem 'active_model_serializers'` to your gemfile. Read
+  [this](https://en.wikipedia.org/wiki/Serialization) if you're curious about
+  serialization. Essentially, we need to convert our data into a format that can
+  be easily transferred across a network and reconstructed later. Remember, our
+  frontend and backend live in different repositories and therefore have to make
+  requests across the _interwebs_.
+
+* Run `bundle install` or just `bundle` if you feel fancy and like shortcuts
+
+---
+
+* Inside of `config/initializers/cors.rb` uncomment the following code:
 
 ```
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
@@ -42,25 +64,41 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       methods: [:get, :post, :put, :patch, :delete, :options, :head]
   end
 end
-
 ```
 
-This snippet is from the [documentation for the rack-cors gem](https://github.com/cyu/rack-cors)
+This snippet is from the
+[documentation for the rack-cors gem](https://github.com/cyu/rack-cors)
 
 **The name after `module` should be whatever you named your project**
 
-Inside the `allow` block, `origins '*'` means we are allowing requests from **all** origins and are allowing `[:get, :post, :patch, :delete]` requests to the API. Read [this](https://www.w3schools.com/tags/ref_httpmethods.asp) if you need a refresher on HTTP methods.
+Inside the `allow` block, `origins '*'` means we are allowing requests from
+**all** origins and are allowing `[:get, :post, :patch, :delete]` requests to
+the API. Read [this](https://www.w3schools.com/tags/ref_httpmethods.asp) if you
+need a refresher on HTTP methods.
 
-As you may recall from the [JS fetch() documentation](https://github.github.io/fetch/), options refer to the body of our AJAX call.
+As you may recall from the
+[JS fetch() documentation](https://github.github.io/fetch/), options refer to
+the body of our AJAX call.
 
-This may come as a shock but `config.api_only = true` tells our app that it is going to be an **API only**. In other words, our API **will not generate any HTML** and instead will return JSON. The frontend is responsible for taking that JSON, formatting the data, and generating HTML to show to the user.
+This may come as a shock but `config.api_only = true` tells our app that it is
+going to be an **API only**. In other words, our API **will not generate any
+HTML** and instead will return JSON. The frontend is responsible for taking that
+JSON, formatting the data, and generating HTML to show to the user.
 
-For now, we will leave the origins open. Later on, we can change this to only allow requests from the address of the frontend repo––localhost:8000 for example.
+For now, we will leave the origins open. Later on, we can change this to only
+allow requests from the address of the frontend repo––localhost:8000 for
+example.
 
 ---
 
-+ Next we are going to create our Notes controller: `rails g controller api/v1/Notes`
-We need to make sure the controllers are namespaced properly. This is the first version of our API. Therefore, the controller should go inside api/v1. If anyone is relying on our API and we update the code in a way that would break other people's projects, it's good practice to make that update its own version of the API. Read [this](https://chriskottom.com/blog/2017/04/versioning-a-rails-api/) if you're curious about API versioning.
+* Next we are going to create our Notes controller: `rails g controller
+  api/v1/Notes` We need to make sure the controllers are namespaced properly.
+  This is the first version of our API. Therefore, the controller should go
+  inside api/v1. If anyone is relying on our API and we update the code in a way
+  that would break other people's projects, it's good practice to make that
+  update its own version of the API. Read
+  [this](https://chriskottom.com/blog/2017/04/versioning-a-rails-api/) if you're
+  curious about API versioning.
 
 Add our index and create methods to `/app/controllers/api/v1/notes_controller`:
 
@@ -83,16 +121,20 @@ class Api::V1::NotesController < ApplicationController
   end
 
 end
-
 ```
+
 A few things are happening in the above methods:
-1. we're rendering all notes in the form of JSON an sending back an HTTP status code of 200
-2. We're creating a new note based on whatever note_params we get from our *frontend*
-3. We're setting out note_params to permit the `body` of our post request; recall that JS `fetch()` requests include a body
+
+1. we're rendering all notes in the form of JSON an sending back an HTTP status
+   code of 200
+2. We're creating a new note based on whatever note_params we get from our
+   _frontend_
+3. We're setting out note_params to permit the `body` of our post request;
+   recall that JS `fetch()` requests include a body
 
 ---
 
-+ Next let's setup our model: `rails g model Note body:string`
+* Next let's setup our model: `rails g model Note body:string`
 
 ---
 
@@ -112,15 +154,16 @@ Note.create([
   ])
 ```
 
-+ Run `rails db:create`
+* Run `rails db:create`
 
-+ Run `rails db:migrate`
+* Run `rails db:migrate`
 
-+ Run `rails db:seed`
+* Run `rails db:seed`
 
 ---
 
-+ Next we'll need to setup our routes. Inside of `config/routes.rb`:
+* Next we'll need to setup our routes. Inside of `config/routes.rb`:
+
 ```
 Rails.application.routes.draw do
   namespace :api do
@@ -129,15 +172,18 @@ Rails.application.routes.draw do
     end
   end
 end
-
 ```
 
-The namespacing means our api can be accessed by navigating to `http://localhost:3000/api/v1/notes`
+The namespacing means our api can be accessed by navigating to
+`http://localhost:3000/api/v1/notes`
 
-+ Let's verify that everything worked by running `rails s` and navigating to [http://localhost:3000/api/v1/notes](http://localhost:3000/api/v1/notes). You should see JSON in your browser.
+* Let's verify that everything worked by running `rails s` and navigating to
+  [http://localhost:3000/api/v1/notes](http://localhost:3000/api/v1/notes). You
+  should see JSON in your browser.
 
-**Major 🔑 alert:** make sure you have the [JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh?hl=en-US) Chrome extension installed. This will make JSON data *much* easier to read.
-
+**Major 🔑 alert:** make sure you have the
+[JSON Viewer](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh?hl=en-US)
+Chrome extension installed. This will make JSON data _much_ easier to read.
 
 If that worked, then congratulations!! Now it's time to setup the frontend.
 
@@ -145,23 +191,27 @@ If that worked, then congratulations!! Now it's time to setup the frontend.
 
 # Setting Up the Frontend
 
-Make sure you create **a separate directory and a separate GitHub repository for the frontend**
+Make sure you create **a separate directory and a separate GitHub repository for
+the frontend**
 
-Open up a new terminal window `command t` and leave your rails server up and running
+Open up a new terminal window `command t` and leave your rails server up and
+running
 
-Once there, `cd` into that directory on your computer and we'll start building out the frontend
+Once there, `cd` into that directory on your computer and we'll start building
+out the frontend
 
-+ Let's create the files and folders we'll need:
+* Let's create the files and folders we'll need:
 
-  + `mkdir bin src styles`
+  * `mkdir bin src styles`
 
-  + `touch index.html`
+  * `touch index.html`
 
-+ Verify everything worked by running `ls` You should see `bin src styles and index.html` at the root directory of your frontend project
+* Verify everything worked by running `ls` You should see `bin src styles and
+  index.html` at the root directory of your frontend project
 
 ---
 
-+ Add the following to `index.html`
+* Add the following to `index.html`
 
 ```
 <!DOCTYPE html>
@@ -192,23 +242,30 @@ Once there, `cd` into that directory on your computer and we'll start building o
   </body>
 </html>
 ```
-Notice that we have a form to create a new note as well as a `notes-container` div. Our notes will be rendered inside this div. We're also loading several JS files: `note.js`, `notesAdapter.js`, `notes.js`, `app.js`, `index.js`
+
+Notice that we have a form to create a new note as well as a `notes-container`
+div. Our notes will be rendered inside this div. We're also loading several JS
+files: `note.js`, `notesAdapter.js`, `notes.js`, `app.js`, `index.js`
 
 ---
 
-+ `cd` into src then
+* `cd` into src then
 
-  + `touch index.js`
+  * `touch index.js`
 
-  + `mkdir adapters components`
+  * `mkdir adapters components`
 
-+ Add the following line to `index.js`: `const app = new App()` Our index file has one responsibility: kicking off the app by creating a new App object
+* Add the following line to `index.js`: `const app = new App()` Our index file
+  has one responsibility: kicking off the app by creating a new App object
 
 ---
 
-+ `cd` into `adapters` and `touch notesAdapter.js`. We will build out the `notesAdapter` in this file. The adapter will be responsible for communicating with our rails API backend
+* `cd` into `adapters` and `touch notesAdapter.js`. We will build out the
+  `notesAdapter` in this file. The adapter will be responsible for communicating
+  with our rails API backend
 
 Your notes adapter should look like this:
+
 ```
 class NotesAdapter {
   constructor() {
@@ -231,19 +288,21 @@ class NotesAdapter {
   }
 
 }
-
 ```
 
-Make sure you read through the code and understand what's going on here before moving on. The notesAdapter component is responsible for communicating with our API backend.
+Make sure you read through the code and understand what's going on here before
+moving on. The notesAdapter component is responsible for communicating with our
+API backend.
 
 ---
 
-+ `cd..` up on level and then `cd` down into `components` and let's make three files:
-  + `touch app.js note.js notes.js`
+* `cd..` up on level and then `cd` down into `components` and let's make three
+  files:
+  * `touch app.js note.js notes.js`
 
 ---
 
-+ `app.js` should look like this:
+* `app.js` should look like this:
 
 ```
 class App {
@@ -253,11 +312,17 @@ class App {
 }
 ```
 
-Let's review the flow of the app: `index.js` gets loaded and calls `new App()` which will run the App constructor function defined above, which will set a property on that newly created app called notes that points to a new instance of our `Notes` object. If that was confusing, stop, re-read it and walk through the app so far until the flow makes sense. Managing all the different files and the game of catch we're playing with them is key to understanding how this project works.
+Let's review the flow of the app: `index.js` gets loaded and calls `new App()`
+which will run the App constructor function defined above, which will set a
+property on that newly created app called notes that points to a new instance of
+our `Notes` object. If that was confusing, stop, re-read it and walk through the
+app so far until the flow makes sense. Managing all the different files and the
+game of catch we're playing with them is key to understanding how this project
+works.
 
 ---
 
-+  Add the following to `notes.js`:
+* Add the following to `notes.js`:
 
 ```
 class Notes {
@@ -317,7 +382,8 @@ class Notes {
 
 ---
 
-+ Next let's build out the `Note` class/object in `note.js`:
+* Next let's build out the `Note` class/object in `note.js`:
+
 ```
 class Note {
   constructor(noteJSON) {
@@ -333,7 +399,10 @@ class Note {
 
 ---
 
-+ Finally, let's add a little bit of styling. `cd` back up to the root directory of this project and then into `/styles` and let's `touch style.css` and add the following:
+* Finally, let's add a little bit of styling. `cd` back up to the root directory
+  of this project and then into `/styles` and let's `touch style.css` and add
+  the following:
+
 ```
 body {
    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -364,8 +433,11 @@ ul {
   color:red;
 }
 ```
+
 # Last Step
 
-+ **Make sure you're still running your rails server** and open up `index.html` and marvel at our work! Our seed data is loaded from the API and we are able to submit new comments and watch as they appear on the page. NOICE!
+* **Make sure you're still running your rails server** and open up `index.html`
+  and marvel at our work! Our seed data is loaded from the API and we are able
+  to submit new comments and watch as they appear on the page. NOICE!
 
 ![alt text](https://media.giphy.com/media/RDbZGZ3O0UmL6/giphy.gif "DJ Khalid with a comically large bottle of champagne in his pool")
