@@ -17,4 +17,16 @@ class NotesAdapter {
     }
     return fetch(this.baseUrl, noteCreateParams).then(res => res.json())
   }
+
+  deleteNote(noteId) {
+    const noteDeleteParams = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+    return fetch(`${this.baseUrl}/${noteId}`, noteDeleteParams).then(res =>
+      res.json()
+    )
+  }
 }
