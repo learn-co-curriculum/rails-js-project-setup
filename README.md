@@ -5,12 +5,13 @@
 In this lesson, you will be building a Rails API backend and JS frontend
 project. This lesson will point you in the right direction for your upcoming
 Rails App w Javascript Frontend Portfolio Project. This document will walk you
-through setting up your project. The instructions and requirements for this
-assignment can be found
+through setting up the project. The instructions and requirements for the
+portfolio project can be found
 [here](https://learn.co/tracks/full-stack-web-development-v3/rails-and-javascript/project-mode/rails-app-with-a-jquery-front-end)
 
 We are going to need two separate repositories. This guide has everything in one
 repo for simplicity but your JS should be in one repo and your API in another.
+We will be building a sample notes application.
 
 # Setting Up the Rails API
 
@@ -20,9 +21,7 @@ repo for simplicity but your JS should be in one repo and your API in another.
 
   * In your terminal enter the following command:
 
-  * `rails new MY-NEW-PROJECT-NAME --database=postgresql --api`
-
-  * **Replace MY-NEW-PROJECT-NAME with the _actual_ name of your project**
+  * `rails new notes-rails-api --database=postgresql --api`
 
   * This will generate a new rails project using postgres as the database.
     **Make sure you are running postgres on your computer**. Look for the
@@ -92,11 +91,11 @@ example.
 ---
 
 * Next we are going to create our Notes controller: `rails g controller
-  api/v1/Notes` We need to make sure the controllers are namespaced properly.
-  This is the first version of our API. Therefore, the controller should go
-  inside api/v1. If anyone is relying on our API and we update the code in a way
-  that would break other people's projects, it's good practice to make that
-  update its own version of the API. Read
+  api/v1/Notes --no-test-framework` We need to make sure the controllers are
+  namespaced properly. This is the first version of our API. Therefore, the
+  controller should go inside api/v1. If anyone is relying on our API and we
+  update the code in a way that would break other people's projects, it's good
+  practice to make that update its own version of the API. Read
   [this](https://chriskottom.com/blog/2017/04/versioning-a-rails-api/) if you're
   curious about API versioning.
 
@@ -127,8 +126,8 @@ A few things are happening in the above methods:
 
 1. we're rendering all notes in the form of JSON an sending back an HTTP status
    code of 200
-2. We're creating a new note based on whatever note_params we get from our
-   _frontend_
+2. We're creating a new note based on whatever note*params we get from our
+   _frontend*
 3. We're setting out note_params to permit the `body` of our post request;
    recall that JS `fetch()` requests include a body
 
@@ -197,8 +196,9 @@ the frontend**
 Open up a new terminal window `command t` and leave your rails server up and
 running
 
-Once there, `cd` into that directory on your computer and we'll start building
-out the frontend
+In your terminal execute `mkdir notes-js-frontend`
+
+Once there, `cd` into that directory and we'll start building out the frontend
 
 * Let's create the files and folders we'll need:
 
@@ -269,24 +269,35 @@ Your notes adapter should look like this:
 ```
 class NotesAdapter {
   constructor() {
-    this.baseUrl = 'http://localhost:3000/api/v1/notes'
+    this.baseUrl = "http://localhost:3000/api/v1/notes"
   }
 
   getNotes() {
-    return fetch(this.baseUrl).then(response => response.json())
+    return fetch(this.baseUrl).then(res => res.json())
   }
 
   createNote(body) {
     const noteCreateParams = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type':'application/json'
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({body})
+      body: JSON.stringify({ body })
     }
-    return fetch(this.baseUrl, noteCreateParams).then(resp => resp.json())
+    return fetch(this.baseUrl, noteCreateParams).then(res => res.json())
   }
 
+  deleteNote(noteId) {
+    const noteDeleteParams = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+    return fetch(`${this.baseUrl}/${noteId}`, noteDeleteParams).then(res =>
+      res.json()
+    )
+  }
 }
 ```
 
