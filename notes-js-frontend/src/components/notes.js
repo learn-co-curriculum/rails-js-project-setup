@@ -12,6 +12,10 @@ class Notes {
     this.notesNode = document.getElementById("notes-container")
     this.notesForm.addEventListener("submit", this.handleAddNote.bind(this))
     this.notesNode.addEventListener("click", this.handleDeleteNote.bind(this))
+    // this.notesNode.addEventListener("dblclick", this.toggleEditNote.bind(this))
+    document
+      .querySelector("body")
+      .addEventListener("dblclick", this.toggleEditNote.bind(this), true)
   }
 
   fetchAndLoadNotes() {
@@ -32,6 +36,12 @@ class Notes {
       .then(noteJSON => this.notes.push(new Note(noteJSON)))
       .then(this.render.bind(this))
       .then(() => (this.noteInput.value = ""))
+  }
+
+  toggleEditNote() {
+    const noteId = event.target.dataset.noteid
+    const note = this.notes.find(n => (n.id = noteId))
+    event.target.innerHTML = `<input type="text" value='${note.body}' />`
   }
 
   handleDeleteNote() {
