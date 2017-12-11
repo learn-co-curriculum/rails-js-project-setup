@@ -21,17 +21,21 @@ We will be building a sample notes application.
 
   * In your terminal enter the following command:
 
-  * `rails new notes-rails-api --database=postgresql --api`
+  * `rails new notes-rails-api --api`
 
-  * This will generate a new rails project using postgres as the database.
-    **Make sure you are running postgres on your computer**. Look for the
-    elephant icon at the top of your screen.
+  * This will generate a new rails project.
 
-  * We specify the `--api` flag so rails knows to set this up as an API.
+- We specify the `--api` flag so rails knows to set this up as an API. If you
+  plan to deploy to heroku then add the `--database=postgresql` flag...this will
+  ensure that your app uses postgres for the database instead of the default
+  sqlite3.
 
-  * `cd` into the new project folder you just created
+  **Make sure you are running postgres on your computer**. Look for the elephant
+  icon at the top of your screen.
 
-* Navigate to your gemfile and uncomment `gem 'rack-cors'` This will allow us to
+- `cd` into the new project folder you just created
+
+- Navigate to your gemfile and uncomment `gem 'rack-cors'` This will allow us to
   setup Cross Origin Resource Sharing (CORS) in our API. You can read more about
   CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
 
@@ -40,14 +44,14 @@ We will be building a sample notes application.
     steal your bank information and your bank allowed API calls from anywhere,
     this could be a bad news bears situation.
 
-* Make sure you add the `gem 'active_model_serializers'` to your gemfile. Read
+- Make sure you add the `gem 'active_model_serializers'` to your gemfile. Read
   [this](https://en.wikipedia.org/wiki/Serialization) if you're curious about
   serialization. Essentially, we need to convert our data into a format that can
   be easily transferred across a network and reconstructed later. Remember, our
   frontend and backend live in different repositories and therefore have to make
   requests across the _interwebs_.
 
-* Run `bundle install` or just `bundle` if you feel fancy and like shortcuts
+- Run `bundle install` or just `bundle` if you feel fancy and like shortcuts
 
 ---
 
