@@ -1,6 +1,6 @@
 class NotesAdapter {
   constructor() {
-    this.baseUrl = "http://localhost:3000/api/v1/notes"
+    this.baseUrl = 'http://localhost:3000/api/v1/notes'
   }
 
   getNotes() {
@@ -9,20 +9,34 @@ class NotesAdapter {
 
   createNote(body) {
     const noteCreateParams = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ body })
     }
     return fetch(this.baseUrl, noteCreateParams).then(res => res.json())
   }
 
+  updateNote(body, id) {
+    const noteUpdateParams = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ body })
+    }
+
+    return fetch(`${this.baseUrl}/${id}`, noteUpdateParams).then(res =>
+      res.json()
+    )
+  }
+
   deleteNote(noteId) {
     const noteDeleteParams = {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       }
     }
     return fetch(`${this.baseUrl}/${noteId}`, noteDeleteParams).then(res =>
