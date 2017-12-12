@@ -94,8 +94,7 @@ example.
 
 ---
 
-* Next we are going to create our Notes controller: `rails g controller
-  api/v1/Notes --no-test-framework` We need to make sure the controllers are
+* Next we are going to create our Notes controller: `rails g controller api/v1/Notes --no-test-framework` We need to make sure the controllers are
   namespaced properly. This is the first version of our API. Therefore, the
   controller should go inside api/v1. If anyone is relying on our API and we
   update the code in a way that would break other people's projects, it's good
@@ -109,7 +108,7 @@ Add our index and create methods to `/app/controllers/api/v1/notes_controller`:
 class Api::V1::NotesController < ApplicationController
 
   def index
-    @notes = Note.all
+    @notes = Note.order(:created_at)
     render json: @notes, status: 200
   end
 
@@ -118,11 +117,24 @@ class Api::V1::NotesController < ApplicationController
     render json: @note, status: 201
   end
 
-  private
-  def note_params
-    params.permit(:body)
+  def destroy
+    note = Note.find(params[:id])
+    if note.destroy
+      render json: {noteId: note.id}, status: 200
+    end
   end
 
+  def update
+    @note = Note.find(params[:id])
+    if @note.update(note_params)
+      render json: @note, status: 200
+    end
+  end
+
+  private
+    def note_params
+      params.require(:note).permit(:body)
+    end
 end
 ```
 
@@ -131,7 +143,7 @@ A few things are happening in the above methods:
 1. we're rendering all notes in the form of JSON an sending back an HTTP status
    code of 200
 2. We're creating a new note based on whatever note*params we get from our
-   _frontend*
+   \_frontend*
 3. We're setting out note_params to permit the `body` of our post request;
    recall that JS `fetch()` requests include a body
 
@@ -210,8 +222,7 @@ Once there, `cd` into that directory and we'll start building out the frontend
 
   * `touch index.html`
 
-* Verify everything worked by running `ls` You should see `bin src styles and
-  index.html` at the root directory of your frontend project
+* Verify everything worked by running `ls` You should see `bin src styles and index.html` at the root directory of your frontend project
 
 ---
 
