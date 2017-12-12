@@ -7,5 +7,9 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 10.times do
-  Note.create(body: Faker::Lorem.sentence)
+  Note.create(body: Faker::Lorem.sentence).tap do |note|
+    2.times do 
+      note.comments.create(content: Faker::Lorem.sentence)
+    end
+  end
 end
