@@ -10,10 +10,10 @@ class Notes {
     this.notesForm = document.getElementById('new-note-form')
     this.noteInput = document.getElementById('new-note-body')
     this.notesNode = document.getElementById('notes-container')
+    this.noteShowNode = document.getElementById('note-show')
     this.body = document.querySelector('body')
     this.notesForm.addEventListener('submit', this.handleAddNote.bind(this))
-    this.notesNode.addEventListener('click', this.handleDeleteNote.bind(this))
-    this.body.addEventListener('click', this.toggleEditNote.bind(this))
+    this.notesNode.addEventListener('click', this.handleNoteClick.bind(this))
     this.body.addEventListener('blur', this.updateNote.bind(this), true)
   }
 
@@ -28,12 +28,19 @@ class Notes {
   }
 
   updateNote() {
-    const { target } = event
-    target.contentEditable = false
-    target.classList.remove('editable')
-    const body = event.target.innerHTML
-    const noteId = target.dataset.noteid
-    this.adapter.updateNote(body, noteId)
+    if (event.target.className.includes('note-element')) {
+      const { target } = event
+      target.contentEditable = false
+      target.classList.remove('editable')
+      const body = event.target.innerHTML
+      const noteId = target.dataset.noteid
+      this.adapter.updateNote(body, noteId).then(updatedNote => {
+        this.notes = this.notes.map(
+          n => (n.id === updatedNote.id ? new Note(updatedNote) : n)
+        )
+        this.render()
+      })
+    }
   }
   handleAddNote() {
     event.preventDefault()
@@ -46,24 +53,31 @@ class Notes {
   }
 
   toggleEditNote() {
-    const { target } = event
+    const { parentElement: target } = event.target
     if (target.className == 'note-element') {
       target.classList.add('editable')
       const noteId = target.dataset.noteid
       const note = this.notes.find(n => n.id == noteId)
       target.contentEditable = true
+      target.innerHTML = note.body
       target.focus()
-      // event.target.innerHTML = `<input type="text" value='${note.body}' />`
     }
   }
 
-  handleDeleteNote() {
+  handleNoteClick() {
     if (
       event.target.dataset.action === 'delete-note' &&
       event.target.parentElement.classList.contains('note-element')
     ) {
       const noteId = event.target.parentElement.dataset.noteid
       this.adapter.deleteNote(noteId).then(resp => this.removeDeletedNote(resp))
+    } else if (event.target.dataset.action === 'edit-note') {
+      this.toggleEditNote()
+    } else if (event.target.className === 'show-link') {
+      debugger
+      const noteId = event.target.parentElement.dataset.noteid
+      const note = this.notes.find(note => note.id === +noteId)
+      this.noteShowNode.innerHTML = note.renderShow()
     }
   }
 
