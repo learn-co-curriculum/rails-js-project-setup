@@ -28,7 +28,13 @@ ul {
   color: red;
 }
 
-.editable {
+#editable {
   border: 1px solid black;
   padding: 20px;
+}
+
+#notes-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 10px;
 }
