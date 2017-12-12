@@ -21,17 +21,21 @@ We will be building a sample notes application.
 
   * In your terminal enter the following command:
 
-  * `rails new notes-rails-api --database=postgresql --api`
+  * `rails new notes-rails-api --api`
 
-  * This will generate a new rails project using postgres as the database.
-    **Make sure you are running postgres on your computer**. Look for the
-    elephant icon at the top of your screen.
+  * This will generate a new rails project.
 
-  * We specify the `--api` flag so rails knows to set this up as an API.
+- We specify the `--api` flag so rails knows to set this up as an API. If you
+  plan to deploy to heroku then add the `--database=postgresql` flag...this will
+  ensure that your app uses postgres for the database instead of the default
+  sqlite3.
 
-  * `cd` into the new project folder you just created
+  **Make sure you are running postgres on your computer**. Look for the elephant
+  icon at the top of your screen.
 
-* Navigate to your gemfile and uncomment `gem 'rack-cors'` This will allow us to
+- `cd` into the new project folder you just created
+
+- Navigate to your gemfile and uncomment `gem 'rack-cors'` This will allow us to
   setup Cross Origin Resource Sharing (CORS) in our API. You can read more about
   CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
 
@@ -40,14 +44,14 @@ We will be building a sample notes application.
     steal your bank information and your bank allowed API calls from anywhere,
     this could be a bad news bears situation.
 
-* Make sure you add the `gem 'active_model_serializers'` to your gemfile. Read
+- Make sure you add the `gem 'active_model_serializers'` to your gemfile. Read
   [this](https://en.wikipedia.org/wiki/Serialization) if you're curious about
   serialization. Essentially, we need to convert our data into a format that can
   be easily transferred across a network and reconstructed later. Remember, our
   frontend and backend live in different repositories and therefore have to make
   requests across the _interwebs_.
 
-* Run `bundle install` or just `bundle` if you feel fancy and like shortcuts
+- Run `bundle install` or just `bundle` if you feel fancy and like shortcuts
 
 ---
 
@@ -90,8 +94,7 @@ example.
 
 ---
 
-* Next we are going to create our Notes controller: `rails g controller
-  api/v1/Notes --no-test-framework` We need to make sure the controllers are
+* Next we are going to create our Notes controller: `rails g controller api/v1/Notes --no-test-framework` We need to make sure the controllers are
   namespaced properly. This is the first version of our API. Therefore, the
   controller should go inside api/v1. If anyone is relying on our API and we
   update the code in a way that would break other people's projects, it's good
@@ -105,7 +108,7 @@ Add our index and create methods to `/app/controllers/api/v1/notes_controller`:
 class Api::V1::NotesController < ApplicationController
 
   def index
-    @notes = Note.all
+    @notes = Note.order(:created_at)
     render json: @notes, status: 200
   end
 
@@ -114,11 +117,24 @@ class Api::V1::NotesController < ApplicationController
     render json: @note, status: 201
   end
 
-  private
-  def note_params
-    params.permit(:body)
+  def destroy
+    note = Note.find(params[:id])
+    if note.destroy
+      render json: {noteId: note.id}, status: 200
+    end
   end
 
+  def update
+    @note = Note.find(params[:id])
+    if @note.update(note_params)
+      render json: @note, status: 200
+    end
+  end
+
+  private
+    def note_params
+      params.require(:note).permit(:body)
+    end
 end
 ```
 
@@ -127,7 +143,7 @@ A few things are happening in the above methods:
 1. we're rendering all notes in the form of JSON an sending back an HTTP status
    code of 200
 2. We're creating a new note based on whatever note*params we get from our
-   _frontend*
+   \_frontend*
 3. We're setting out note_params to permit the `body` of our post request;
    recall that JS `fetch()` requests include a body
 
@@ -206,8 +222,7 @@ Once there, `cd` into that directory and we'll start building out the frontend
 
   * `touch index.html`
 
-* Verify everything worked by running `ls` You should see `bin src styles and
-  index.html` at the root directory of your frontend project
+* Verify everything worked by running `ls` You should see `bin src styles and index.html` at the root directory of your frontend project
 
 ---
 
@@ -402,8 +417,16 @@ class Note {
     this.id = noteJSON.id
   }
 
+  renderShow() {
+    return `<h3>${this.body}</h3>`
+  }
+
   render() {
-    return `<li data-noteid='${this.id}' data-props='${JSON.stringify(this)}' class='note-element'>${this.body} <i data-action='delete-note' class="em em-scream_cat"></i></li>`
+    return `<li data-noteid='${this.id}' data-props='${JSON.stringify(
+      this
+    )}' class='note-element'><a class="show-link" href='#'>${
+      this.body
+    }</a> <button data-action='edit-note'>Edit</button> <i data-action='delete-note' class="em em-scream_cat"></i></li>`
   }
 }
 ```
