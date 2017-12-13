@@ -1,26 +1,9 @@
 class Note {
   constructor(noteJSON) {
     this.comments = []
-    this.init()
     this.body = noteJSON.body
     this.id = noteJSON.id
     this.loadComments(noteJSON.comments)
-  }
-
-  init() {
-    this.noteShowNode = document.getElementById('note-show')
-
-    if (this.noteShowNode.addEventListener) {
-      this.noteShowNode.addEventListener('click', handleAddComment, false)
-    } else if (this.noteShowNode.attachEvent) {
-      this.noteShowNode.attachEvent('onclick', handleAddComment)
-    }
-  }
-
-  handleAddComment(event) {
-    event.preventDefault()
-    const content = event.target.children[0].value
-    console.log(content)
   }
 
   loadComments(comments) {
@@ -41,7 +24,7 @@ class Note {
     return `<h3>${this.body}</h3>
             <p>Comments</p>
             <ul>${this.commentsHTML()}</ul>
-            <form id="new-comment-form">
+            <form id="new-comment-form" data-id=${this.id}>
               <input type="text" name="comment-body" id="new-comment-body">
               <input type="submit" value="Save comment">
             </form>
