@@ -13,8 +13,20 @@ class Notes {
     this.noteShowNode = document.getElementById('note-show')
     this.body = document.querySelector('body')
     this.notesForm.addEventListener('submit', this.handleAddNote.bind(this))
+    this.noteShowNode.addEventListener(
+      'submit',
+      this.handleAddComment.bind(this),
+      false
+    )
     this.notesNode.addEventListener('click', this.handleNoteClick.bind(this))
     this.body.addEventListener('blur', this.updateNote.bind(this), true)
+  }
+
+  handleAddComment(event) {
+    event.preventDefault()
+    const content = event.target.children[0].value
+    const id = event.target.dataset.id
+    this.adapter.createComment(content, id)
   }
 
   fetchAndLoadNotes() {
