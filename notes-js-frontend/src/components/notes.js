@@ -35,10 +35,12 @@ class Notes {
       const body = event.target.innerHTML
       const noteId = target.dataset.noteid
       this.adapter.updateNote(body, noteId).then(updatedNote => {
+        const newNote = new Note(updatedNote)
         this.notes = this.notes.map(
-          n => (n.id === updatedNote.id ? new Note(updatedNote) : n)
+          note => (note.id === updatedNote.id ? newNote : note)
         )
         this.render()
+        this.noteShowNode.innerHTML = newNote.renderShow()
       })
     }
   }
@@ -74,7 +76,6 @@ class Notes {
     } else if (event.target.dataset.action === 'edit-note') {
       this.toggleEditNote()
     } else if (event.target.className === 'show-link') {
-      debugger
       const noteId = event.target.parentElement.dataset.noteid
       const note = this.notes.find(note => note.id === +noteId)
       this.noteShowNode.innerHTML = note.renderShow()
