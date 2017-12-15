@@ -7,6 +7,14 @@ class Api::V1::CommentsController < ApplicationController
     end       
   end
 
+  def destroy
+    note = Note.find(params[:note_id])
+    comment = note.comments.find(params[:id])
+    if comment.destroy
+      render json: {commentId: comment.id}, status: 200
+    end
+  end
+
   private
     def comment_params
       params.permit(:content)
