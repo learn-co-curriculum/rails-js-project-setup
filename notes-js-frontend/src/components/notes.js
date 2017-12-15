@@ -118,6 +118,7 @@ class Notes {
   removeDeletedNote(deleteResponse) {
     this.notes = this.notes.filter(note => note.id !== deleteResponse.noteId)
     this.render()
+    this.noteShowNode.innerHTML = ''
   }
 
   notesHTML() {
