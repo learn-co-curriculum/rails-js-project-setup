@@ -44,6 +44,20 @@ class NotesAdapter {
     )
   }
 
+  deleteNoteComment(noteId, commentId) {
+    const noteDeleteParams = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+
+    return fetch(
+      `${this.baseUrl}/${noteId}/comments/${commentId}`,
+      noteDeleteParams
+    ).then(res => res.json())
+  }
+
   createComment(content, id) {
     const commentCreateParams = {
       method: 'POST',

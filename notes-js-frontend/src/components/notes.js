@@ -18,8 +18,25 @@ class Notes {
       this.handleAddComment.bind(this),
       false
     )
+    this.noteShowNode.addEventListener(
+      'click',
+      this.handleCommentClick.bind(this)
+    )
     this.notesNode.addEventListener('click', this.handleNoteClick.bind(this))
     this.body.addEventListener('blur', this.updateNote.bind(this), true)
+  }
+
+  handleCommentClick() {
+    if (event.target.dataset.action === 'delete-note') {
+      const { parentElement: target } = event.target
+      const noteId = target.dataset.noteid
+      const commentId = target.dataset.commentid
+      const note = this.notes.find(note => note.id === +noteId)
+      this.adapter.deleteNoteComment(noteId, commentId).then(data => {
+        note.removeComment(data.commentId)
+        this.noteShowNode.innerHTML = note.renderShow()
+      })
+    }
   }
 
   handleAddComment(event) {
@@ -28,7 +45,7 @@ class Notes {
     const noteId = event.target.dataset.id
     const note = this.notes.find(note => note.id === +noteId)
     this.adapter.createComment(content, noteId).then(comment => {
-      note.addComment(new Comment(comment))
+      note.addComment(new Comment(comment, noteId))
       this.noteShowNode.innerHTML = note.renderShow()
     })
   }
