@@ -6,6 +6,10 @@ class Note {
     this.loadComments(noteJSON.comments)
   }
 
+  addComment(newComment) {
+    this.comments = this.comments.concat(newComment)
+  }
+
   loadComments(comments) {
     comments.forEach(commentJSON => {
       this.comments.push(new Comment(commentJSON))

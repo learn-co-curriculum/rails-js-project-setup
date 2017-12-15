@@ -25,8 +25,12 @@ class Notes {
   handleAddComment(event) {
     event.preventDefault()
     const content = event.target.children[0].value
-    const id = event.target.dataset.id
-    this.adapter.createComment(content, id)
+    const noteId = event.target.dataset.id
+    const note = this.notes.find(note => note.id === +noteId)
+    this.adapter.createComment(content, noteId).then(comment => {
+      note.addComment(new Comment(comment))
+      this.noteShowNode.innerHTML = note.renderShow()
+    })
   }
 
   fetchAndLoadNotes() {
