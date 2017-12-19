@@ -13,71 +13,17 @@ class Notes {
     this.noteShowNode = document.getElementById('note-show')
     this.body = document.querySelector('body')
     this.notesForm.addEventListener('submit', this.handleAddNote.bind(this))
+    this.body.addEventListener('blur', this.updateNote.bind(this))
+    this.notesNode.addEventListener('click', this.handleNoteClick.bind(this))
     this.noteShowNode.addEventListener(
       'submit',
-      this.handleAddComment.bind(this),
-      false
+      this.handleAddComment.bind(this)
     )
     this.noteShowNode.addEventListener(
       'click',
       this.handleCommentClick.bind(this)
     )
-    this.noteShowNode.addEventListener(
-      'blur',
-      this.updateComment.bind(this),
-      true
-    )
-    this.notesNode.addEventListener('click', this.handleNoteClick.bind(this))
-    this.body.addEventListener('blur', this.updateNote.bind(this), true)
-  }
-
-  findById(id) {
-    return this.notes.find(note => note.id === +id)
-  }
-
-  updateComment() {
-    if (event.target.className === 'editable') {
-      const { target } = event
-      target.contentEditable = false
-      const noteId = target.dataset.noteid
-      const commentId = target.dataset.commentid
-      const note = this.findById(noteId)
-      target.classList.remove('editable')
-      const body = target.innerHTML
-
-      this.adapter
-        .updateNoteComment(noteId, commentId, body)
-        .then(updatedComment => {
-          note.updateComment(updatedComment, noteId)
-          this.noteShowNode.innerHTML = note.renderShow()
-        })
-    }
-  }
-
-  handleCommentClick() {
-    if (event.target.dataset.action === 'delete-note') {
-      const { parentElement: target } = event.target
-      const noteId = target.dataset.noteid
-      const commentId = target.dataset.commentid
-      const note = this.findById(noteId)
-      this.adapter.deleteNoteComment(noteId, commentId).then(data => {
-        note.removeComment(data.commentId)
-        this.noteShowNode.innerHTML = note.renderShow()
-      })
-    } else if (event.target.dataset.action === 'edit-note') {
-      this.toggleEditComment()
-    }
-  }
-
-  handleAddComment(event) {
-    event.preventDefault()
-    const content = event.target.children[0].value
-    const noteId = event.target.dataset.id
-    const note = this.findById(noteId)
-    this.adapter.createComment(content, noteId).then(comment => {
-      note.addComment(new Comment(comment, noteId))
-      this.noteShowNode.innerHTML = note.renderShow()
-    })
+    this.noteShowNode.addEventListener('blur', this.updateComment.bind(this))
   }
 
   fetchAndLoadNotes() {
@@ -88,6 +34,20 @@ class Notes {
       )
       .then(this.render.bind(this))
       .catch(error => console.log(error))
+  }
+
+  findById(id) {
+    return this.notes.find(note => note.id === +id)
+  }
+
+  handleAddNote() {
+    event.preventDefault()
+    const body = this.noteInput.value
+    this.adapter
+      .createNote(body)
+      .then(noteJSON => this.notes.push(new Note(noteJSON)))
+      .then(this.render.bind(this))
+      .then(() => (this.noteInput.value = ''))
   }
 
   updateNote() {
@@ -106,15 +66,6 @@ class Notes {
         this.noteShowNode.innerHTML = newNote.renderShow()
       })
     }
-  }
-  handleAddNote() {
-    event.preventDefault()
-    const body = this.noteInput.value
-    this.adapter
-      .createNote(body)
-      .then(noteJSON => this.notes.push(new Note(noteJSON)))
-      .then(this.render.bind(this))
-      .then(() => (this.noteInput.value = ''))
   }
 
   toggleEditNote() {
@@ -145,18 +96,6 @@ class Notes {
     }
   }
 
-  toggleEditComment() {
-    const { parentElement: target } = event.target
-    target.classList.add('editable')
-    const noteId = target.dataset.noteid
-    const commentId = target.dataset.commentid
-    const note = this.notes.find(n => n.id == noteId)
-    const comment = note.comments.find(comment => comment.id === +commentId)
-    target.contentEditable = true
-    target.innerHTML = comment.content
-    target.focus()
-  }
-
   removeDeletedNote(deleteResponse) {
     this.notes = this.notes.filter(note => note.id !== deleteResponse.noteId)
     this.render()
@@ -169,5 +108,63 @@ class Notes {
 
   render() {
     this.notesNode.innerHTML = `<ul>${this.notesHTML()}</ul>`
+  }
+
+  //comment CRUD
+  handleAddComment(event) {
+    event.preventDefault()
+    const content = event.target.children[0].value
+    const noteId = event.target.dataset.id
+    const note = this.findById(noteId)
+    this.adapter.createComment(content, noteId).then(comment => {
+      note.addComment(new Comment(comment, noteId))
+      this.noteShowNode.innerHTML = note.renderShow()
+    })
+  }
+
+  toggleEditComment() {
+    const { parentElement: target } = event.target
+    target.classList.add('editable')
+    const noteId = target.dataset.noteid
+    const commentId = target.dataset.commentid
+    const note = this.notes.find(n => n.id == noteId)
+    const comment = note.comments.find(comment => comment.id === +commentId)
+    target.contentEditable = true
+    target.innerHTML = comment.content
+    target.focus()
+  }
+
+  updateComment() {
+    if (event.target.className === 'editable') {
+      const { target } = event
+      const noteId = target.dataset.noteid
+      const commentId = target.dataset.commentid
+      const note = this.findById(noteId)
+      target.contentEditable = false
+      const content = target.innerHTML
+      target.classList.remove('editable')
+
+      this.adapter
+        .updateNoteComment(noteId, commentId, content)
+        .then(updatedComment => {
+          note.updateComment(updatedComment, noteId)
+          this.noteShowNode.innerHTML = note.renderShow()
+        })
+    }
+  }
+
+  handleCommentClick() {
+    if (event.target.dataset.action === 'delete-note') {
+      const { parentElement: target } = event.target
+      const noteId = target.dataset.noteid
+      const commentId = target.dataset.commentid
+      const note = this.findById(noteId)
+      this.adapter.deleteNoteComment(noteId, commentId).then(data => {
+        note.removeComment(data.commentId)
+        this.noteShowNode.innerHTML = note.renderShow()
+      })
+    } else if (event.target.dataset.action === 'edit-note') {
+      this.toggleEditComment()
+    }
   }
 }
