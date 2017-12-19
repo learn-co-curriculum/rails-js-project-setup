@@ -14,6 +14,15 @@ class Note {
     this.comments = this.comments.concat(newComment)
   }
 
+  updateComment(updatedComment, noteId) {
+    this.comments = this.comments.map(
+      comment =>
+        comment.id === updatedComment.id
+          ? new Comment(updatedComment, noteId)
+          : comment
+    )
+  }
+
   loadComments(comments) {
     comments.forEach(commentJSON => {
       this.comments.push(new Comment(commentJSON, this.id))
