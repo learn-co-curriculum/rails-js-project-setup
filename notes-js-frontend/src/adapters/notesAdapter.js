@@ -43,4 +43,46 @@ class NotesAdapter {
       res.json()
     )
   }
+
+  updateNoteComment(noteId, commentId, content) {
+    const commentUpdateParams = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content })
+    }
+
+    return fetch(
+      `${this.baseUrl}/${noteId}/comments/${commentId}`,
+      commentUpdateParams
+    ).then(res => res.json())
+  }
+
+  deleteNoteComment(noteId, commentId) {
+    const noteDeleteParams = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+
+    return fetch(
+      `${this.baseUrl}/${noteId}/comments/${commentId}`,
+      noteDeleteParams
+    ).then(res => res.json())
+  }
+
+  createComment(content, id) {
+    const commentCreateParams = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content })
+    }
+    return fetch(`${this.baseUrl}/${id}/comments`, commentCreateParams).then(
+      res => res.json()
+    )
+  }
 }
