@@ -44,6 +44,21 @@ class NotesAdapter {
     )
   }
 
+  updateNoteComment(noteId, commentId, content) {
+    const commentUpdateParams = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content })
+    }
+
+    return fetch(
+      `${this.baseUrl}/${noteId}/comments/${commentId}`,
+      commentUpdateParams
+    ).then(res => res.json())
+  }
+
   deleteNoteComment(noteId, commentId) {
     const noteDeleteParams = {
       method: 'DELETE',
