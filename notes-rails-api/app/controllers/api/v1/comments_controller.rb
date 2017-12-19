@@ -15,6 +15,15 @@ class Api::V1::CommentsController < ApplicationController
     end
   end
 
+  def update
+    note = Note.find(params[:note_id])
+    comment = note.comments.find(params[:id])
+
+    if comment.update(comment_params)
+      render json: comment, status: 200
+    end
+  end
+
   private
     def comment_params
       params.permit(:content)
